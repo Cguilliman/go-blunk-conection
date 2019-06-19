@@ -2,6 +2,8 @@ package models
 
 import (
     "database/sql"
+    // "fmt"
+    db "github.com/Cguilliman/test_blunk_db/database/base"
 )
 
 type Model interface {
@@ -9,26 +11,30 @@ type Model interface {
     // ResponseConvert([]Model) ([]interface{})
 }
 
-func Query(scanOne func(*sql.Rows)(Model, error), query string, db *sql.DB) ([]Model, error) {
-    rows, err := db.Query(query)
+// type ModelQuerySet interface {
+//     // []*Model
+//     string
+//     MakeQuery(string)
+// }
+
+// func (self *ModelQuerySet) MakeQuery(query string) {
+//     rows, err := db.Query(query)
+
+// }
+
+func Query(query string, responseChan chan *sql.Rows) error {
+    database := db.GetDB()
+    rows, err := database.Query(query)
     if err != nil {
-        return nil, err
+        close(responseChan)
+        return err
     }
     defer rows.Close()
-
-    response_set := make([]Model, 0)
     for rows.Next() {
-        obj, err := scanOne(rows)
-        if err != nil {
-            return nil, err
-        }
-        response_set = append(response_set, obj)
+        responseChan <- rows
     }
-
-    if err := rows.Err(); err != nil {
-        return nil, err
-    }
-    return response_set, nil
+    close(responseChan)
+    return nil
 }
 
 // TODO: implement creation/updating

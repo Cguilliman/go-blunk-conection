@@ -1,6 +1,8 @@
 package models
 
-import "database/sql"
+import (
+    "database/sql"
+)
 
 type Message struct {
     ID      uint
@@ -21,22 +23,41 @@ func (self *Message) Scan(rows *sql.Rows) (Model, error) {
     )
 }
 
-func ScanMessage(rows *sql.Rows) (Model, error) {
-    return new(Message).Scan(rows)
+type MessageQuerySet struct {
+    Response []*Message
+    Errors   []error
+    Query    string
 }
 
-func Empty() []*Message {
-    return make([]Message, 0)
+func (self *MessageQuerySet) IsErr() bool {
+    return len(self.Errors) > 0
 }
 
-func ConvertOne(obj Model) *Message {
-    return obj.(*Message)
-}
+func (self *MessageQuerySet) MakeQuery(query string, scanOne func(*sql.Rows)(*Message, error)) *MessageQuerySet {
+    self.Response = make([]*Message, 0) 
+    messageChan := make(chan *sql.Rows)
 
-func ResponseConvert(response []Model) []*interface{} {
-    var messages []*Message
-    for _, obj := range response {
-        messages = append(messages, obj.(*Message))
+    if scanOne == nil {
+        scanOne = func(rows *sql.Rows)(*Message, error) {
+            models, err := new(Message).Scan(rows)
+            return models.(*Message), err
+        }
     }
-    return messages
+
+    go func() {
+        if err := Query(query, messageChan); err != nil {
+            self.Errors = append(self.Errors, err)
+        }
+    }()
+    for rows := range messageChan {
+        message, err := scanOne(rows)
+        if err != nil {
+            close(messageChan)
+            self.Errors = append(self.Errors, err)
+            return self
+        }
+        self.Response = append(self.Response, message)
+    }
+
+    return self
 }
