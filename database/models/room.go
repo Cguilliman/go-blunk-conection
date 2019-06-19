@@ -7,7 +7,7 @@ import "database/sql"
 type Room struct {
     ID       uint
     Name     string
-    Messages []Message
+    Messages []*Message
 }
 
 func (self *Room) Scan(rows *sql.Rows) (Model, error) {
@@ -19,6 +19,7 @@ type RoomQuerySet struct {
     Rooms  []*Room
     Errors []error
     Query  string
+    // Index  map(int)*Room
 }
 
 func (self *RoomQuerySet) IsErr() bool {

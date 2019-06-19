@@ -12,6 +12,7 @@ func main() {
     db := db.Init()
     defer db.Close()
     database.GetMessage()
+    database.GetRooms()
     engine := gin.Default()
     engine.Run("0.0.0.0:8000")
 }
