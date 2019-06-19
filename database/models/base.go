@@ -6,6 +6,7 @@ import (
 
 type Model interface {
     Scan(*sql.Rows) (Model, error)
+    // ResponseConvert([]Model) ([]interface{})
 }
 
 func Query(scanOne func(*sql.Rows)(Model, error), query string, db *sql.DB) ([]Model, error) {

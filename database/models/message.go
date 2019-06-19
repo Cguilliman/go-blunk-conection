@@ -24,3 +24,19 @@ func (self *Message) Scan(rows *sql.Rows) (Model, error) {
 func ScanMessage(rows *sql.Rows) (Model, error) {
     return new(Message).Scan(rows)
 }
+
+func Empty() []*Message {
+    return make([]Message, 0)
+}
+
+func ConvertOne(obj Model) *Message {
+    return obj.(*Message)
+}
+
+func ResponseConvert(response []Model) []*interface{} {
+    var messages []*Message
+    for _, obj := range response {
+        messages = append(messages, obj.(*Message))
+    }
+    return messages
+}
