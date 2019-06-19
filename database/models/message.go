@@ -2,18 +2,20 @@ package models
 
 import (
     "database/sql"
+    "time"
     // "fmt"
 )
 
 // implement `Model`
 type Message struct {
-    ID      uint
-    Message string
-    IsRead  bool
-    RoomID  int
-    FromID  int
-    ToID    int
-    Room    *Room
+    ID        uint
+    Message   string
+    IsRead    bool
+    RoomID    int
+    FromID    int
+    ToID      int
+    CreatedAt time.Time
+    Room      *Room
 }
 
 // implement conversion in Message object

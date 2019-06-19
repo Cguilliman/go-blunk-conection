@@ -2,16 +2,21 @@ package models
 
 import "database/sql"
 
-
 // implement `Model`
 type Room struct {
-    ID       uint
-    Name     string
-    Messages []*Message
+    ID        uint
+    Name      string
+    Messages  []*Message
 }
 
 func (self *Room) Scan(rows *sql.Rows) (Model, error) {
     return self, rows.Scan(&self.ID, &self.Name)
+}
+
+type RoomPerson struct {
+    ID     uint
+    Person Person
+    Room   Room
 }
 
 // implement `ModelQuerySet`

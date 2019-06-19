@@ -35,7 +35,7 @@ func GetRooms() {
     rows, _ := database.Query(`
         select 
             Room.*, Message.Message, 
-            Message.IsRead 
+            Message.IsRead, Message.CreatedAt
         from 
             Room left join Message 
         on 
@@ -50,6 +50,7 @@ func GetRooms() {
         err := rows.Scan(
             &room.ID, &room.Name,
             &message.Message, &message.IsRead,
+            &message.CreatedAt,
         )
         if err != nil {
             fmt.Println(err)
@@ -68,8 +69,11 @@ func GetRooms() {
         fmt.Println("-------")
         fmt.Println(room.Name)
         for _, message := range room.Messages {
-            fmt.Println(message.Message, message.IsRead)
+            fmt.Println(
+                message.Message, 
+                message.IsRead, 
+                message.CreatedAt,
+            )
         }
     }
-    // fmt.Println(roomsIndx)
 }

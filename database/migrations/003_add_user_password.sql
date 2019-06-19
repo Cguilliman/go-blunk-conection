@@ -1,0 +1,1 @@
+alter table Person add Password text;
