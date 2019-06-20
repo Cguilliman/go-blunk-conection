@@ -4,9 +4,10 @@ import "database/sql"
 
 // implement `Model`
 type Room struct {
-    ID        uint
-    Name      string
-    Messages  []*Message
+    ID       uint
+    Name     string
+    Messages []*Message
+    Persons  []*Person
 }
 
 func (self *Room) Scan(rows *sql.Rows) (Model, error) {
@@ -14,9 +15,11 @@ func (self *Room) Scan(rows *sql.Rows) (Model, error) {
 }
 
 type RoomPerson struct {
-    ID     uint
-    Person Person
-    Room   Room
+    ID       uint
+    PersonID int
+    RoomID   int
+    Person   *Person
+    Room     *Room
 }
 
 // implement `ModelQuerySet`
@@ -24,7 +27,6 @@ type RoomQuerySet struct {
     Rooms  []*Room
     Errors []error
     Query  string
-    // Index  map(int)*Room
 }
 
 func (self *RoomQuerySet) IsErr() bool {

@@ -4,15 +4,16 @@ import (
     // "fmt"
     // "database/sql"
     "github.com/gin-gonic/gin"
-    "github.com/Cguilliman/test_blunk_db/database"
+    "github.com/Cguilliman/test_blunk_db/database/requests"
     db "github.com/Cguilliman/test_blunk_db/database/base"
 )
 
 func main() {
     db := db.Init()
     defer db.Close()
-    database.GetMessage()
-    database.GetRooms()
+    // requests.GetMessage()
+    // requests.GetRooms()
+    requests.MainUserRoomsList(1)
     engine := gin.Default()
     engine.Run("0.0.0.0:8000")
 }

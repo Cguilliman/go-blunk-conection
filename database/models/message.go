@@ -2,7 +2,7 @@ package models
 
 import (
     "database/sql"
-    "time"
+    // "time"
     // "fmt"
 )
 
@@ -14,8 +14,10 @@ type Message struct {
     RoomID    int
     FromID    int
     ToID      int
-    CreatedAt time.Time
+    CreatedAt string  // crushing while `time.Time`
     Room      *Room
+    From      *Person
+    To        *Person
 }
 
 // implement conversion in Message object
