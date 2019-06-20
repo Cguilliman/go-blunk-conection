@@ -2,16 +2,73 @@ package requests
 
 import (
     "fmt"
-    "database/sql"
+    // "database/sql"
     "github.com/Cguilliman/test_blunk_db/database/models"
     "github.com/Cguilliman/test_blunk_db/database/base"
 )
 
-// func GetMessage(page, paginateBy int) {
-//     database := base.GetDB()
-//     rows, err := database.Query(`
-//     `)
-// }
+type Pagination struct {
+    PerPage     int
+    Amount      int
+    CurrentPage int
+}
+
+type PaginatedMessages struct {
+    Messages   []*models.Message
+    Pagination *Pagination
+}
+
+func GetMessages(page, paginateBy int) {
+    database := base.GetDB()
+    // Get general messages amount
+    rows, err := database.Query(`select count(*) as MessageCount from Message;`)
+    if err != nil {
+        fmt.Println(err)
+    }
+    rows.Next()
+    var messageCount int
+    err = rows.Scan(&messageCount)
+    if err != nil {
+        fmt.Println(err)
+    }
+
+    // Get messages with pagination
+    rows, err = database.Query(fmt.Sprintf(`
+        select 
+            Message.ID, Message.Message, 
+            Message.CreatedAt, Person.Username,
+            Person.LastName, Person.FirstName
+        from Message
+            inner join Person on Message.FromID=Person.ID
+        limit %d, %d
+    `, paginateBy*page-paginateBy, paginateBy))
+    if err != nil {
+        fmt.Println(err)
+    }
+    response := new(PaginatedMessages)
+    for rows.Next() {
+        message := new(models.Message)
+        message.From = new(models.Person)
+        err := rows.Scan(
+            &message.ID, &message.Message,
+            &message.CreatedAt, &message.From.Username,
+            &message.From.LastName, &message.From.FirstName,
+        )
+        if err != nil {
+            fmt.Println(err)
+        }
+        response.Messages = append(response.Messages, message)
+    }
+    response.Pagination = &Pagination{
+        PerPage:     paginateBy,
+        Amount:      messageCount,
+        CurrentPage: page,
+    }
+    fmt.Println(response.Pagination)
+    for _, message := range response.Messages {
+        fmt.Println(message)
+    }
+}
 
 // func GetMessage() {
 //     queryset := new(models.MessageQuerySet).NewQuery(

@@ -13,7 +13,12 @@ func main() {
     defer db.Close()
     // requests.GetMessage()
     // requests.GetRooms()
-    requests.MainUserRoomsList(1)
+    // requests.MainUserRoomsList(1)
+
+    requests.GetMessages(1, 2)
+    requests.GetMessages(2, 2)
+    requests.GetMessages(3, 2)
+    
     engine := gin.Default()
     engine.Run("0.0.0.0:8000")
 }
