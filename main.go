@@ -21,10 +21,15 @@ func main() {
     // requests.GetMessages(3, 2)
     
     // requests.GetPerson(1)
-    requests.CreatePerson(&models.Person{
-        Username:  "James",
-        FirstName: "fName",
-        LastName:  "lName",
+    // requests.CreatePerson(&models.Person{
+    //     Username:  "James1",
+    //     FirstName: "fName2",
+    //     LastName:  "lName3",
+    // })
+    requests.UpdatePerson(5, &models.Person{
+        Username:  "Jamesnew",
+        FirstName: "fNamenew",
+        LastName:  "lNamenew",
     })
     engine := gin.Default()
     engine.Run("0.0.0.0:8000")

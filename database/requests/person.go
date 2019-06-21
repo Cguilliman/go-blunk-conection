@@ -3,6 +3,7 @@ package requests
 import (
     "fmt"
     "reflect"
+    "strings"
     "github.com/Cguilliman/test_blunk_db/database/models"
     "github.com/Cguilliman/test_blunk_db/database/base"
 )
@@ -51,7 +52,7 @@ func Test(value interface{}) (string, bool) {
         if value.(string) == "" {
             return "", false
         }
-        return value.(string), true
+        return fmt.Sprintf("'%s'", value.(string)), true
     case bool:
         if value.(bool) {
             return "1", true
@@ -62,8 +63,7 @@ func Test(value interface{}) (string, bool) {
     }
 }
 
-// create person (registration)
-func CreatePerson(person *models.Person) {
+func ConvertPersonToPush(person *models.Person) ([]string, []string) {
     var fields, values []string
 
     elems := reflect.ValueOf(person).Elem()
@@ -72,29 +72,48 @@ func CreatePerson(person *models.Person) {
     for i := 0; i < elems.NumField(); i++ {
         value, ok := Test(elems.Field(i).Interface())
         if ok && typeOf.Field(i).Name != "ID" {
-            fields = append(fields, value)
-            values = append(values, typeOf.Field(i).Name)
+            values = append(values, value)
+            fields = append(fields, typeOf.Field(i).Name)
         }
-        // fmt.Println(elems.Field(i).String())
-        // fmt.Println(reflect.TypeOf(elems.Field(i).Interface()))
     }
-    fmt.Println(fields)
-    fmt.Println(values)
-    // database := base.GetDB()
-    // rows, err := database.Query(`
-    //     insert into Person ()
-    // `)
+    return fields, values
 }
 
-func PushToPerson(fields, values []string) {
+// create person (registration)
+func CreatePerson(person *models.Person) {
+    fields, values := ConvertPersonToPush(person)
+
     insertFields := strings.Join(fields, ",")
     insertValues := strings.Join(values, ",")
+    
     database := base.GetDB()
-    rows, err := database.Query(`
-        insert into Person(%s)
-    `)
+    _, err := database.Exec(fmt.Sprintf(`
+        insert into Person(%s) 
+        values (%s)
+    `, insertFields, insertValues))
+    
+    if err != nil {
+        fmt.Println(err)
+    }
 }
 
+
 // update person
-func UpdatePerson() {
+func UpdatePerson(id int, person *models.Person) {
+    fields, values := ConvertPersonToPush(person)
+    var set []string
+    for i := 0; i < len(fields); i++ {
+        set = append(set, fmt.Sprintf("%s = %s", fields[i], values[i]))
+    }
+    setValue := strings.Join(set, ",")
+
+    database := base.GetDB()
+    _, err := database.Exec(fmt.Sprintf(`
+        update Person 
+        set %s
+        where Person.ID = %d
+    `, setValue, id))
+    if err != nil {
+        fmt.Println(err)
+    }
 }
