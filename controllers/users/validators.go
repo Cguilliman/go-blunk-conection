@@ -12,11 +12,11 @@ import (
 
 type UserRegistrationValidator struct {
     Person struct {
-        Username  string `from:"username" json:"username" binding:"exists,max=255"` 
+        Username  string `from:"username"  json:"username"  binding:"exists,max=255"` 
         FirstName string `from:"firstname" json:"firstname" binding:"exists,max=255"` 
-        LastName  string `from:"lastname" json:"lastname" binding:"exists,max=255"` 
-        Password  string `from:"password" json:"password" binding:"exists,max=255"` 
-    } `json:person`
+        LastName  string `from:"lastname"  json:"lastname"  binding:"exists,max=255"` 
+        Password  string `from:"password"  json:"password"  binding:"exists,max=255"` 
+    } `json:"person"`
     personModel models.Person `json:"-"`
 }
 
@@ -29,7 +29,6 @@ func ConvertPassword(password []byte) (string, error) {
 
 func Bind(c *gin.Context, obj interface{}) error {
     b := binding.Default(c.Request.Method, c.ContentType())
-    // fmt.Println(b)
     return c.ShouldBindWith(obj, b)
 }
 
