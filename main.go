@@ -4,9 +4,10 @@ import (
     // "fmt"
     // "database/sql"
     "github.com/gin-gonic/gin"
-    "github.com/Cguilliman/test_blunk_db/database/requests"
-    "github.com/Cguilliman/test_blunk_db/database/models"
-    db "github.com/Cguilliman/test_blunk_db/database/base"
+    // "github.com/Cguilliman/chat/database/requests"
+    // "github.com/Cguilliman/chat/database/models"
+    db "github.com/Cguilliman/chat/database/base"
+    "github.com/Cguilliman/chat/controllers"
 )
 
 func main() {
@@ -22,15 +23,16 @@ func main() {
     
     // requests.GetPerson(1)
     // requests.CreatePerson(&models.Person{
-    //     Username:  "James1",
+    //     Username:  "J2",
     //     FirstName: "fName2",
     //     LastName:  "lName3",
     // })
-    requests.UpdatePerson(5, &models.Person{
-        Username:  "Jamesnew",
-        FirstName: "fNamenew",
-        LastName:  "lNamenew",
-    })
+    // requests.UpdatePerson(5, &models.Person{
+    //     Username:  "Jamesnew",
+    //     FirstName: "fNamenew",
+    //     LastName:  "lNamenew",
+    // })
     engine := gin.Default()
+    controllers.InitRoutings(engine)
     engine.Run("0.0.0.0:8000")
 }

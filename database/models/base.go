@@ -2,7 +2,7 @@ package models
 
 import (
     "database/sql"
-    db "github.com/Cguilliman/test_blunk_db/database/base"
+    db "github.com/Cguilliman/chat/database/base"
 )
 
 type Model interface {

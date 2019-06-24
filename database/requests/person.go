@@ -4,8 +4,8 @@ import (
     "fmt"
     "reflect"
     "strings"
-    "github.com/Cguilliman/test_blunk_db/database/models"
-    "github.com/Cguilliman/test_blunk_db/database/base"
+    "github.com/Cguilliman/chat/database/models"
+    "github.com/Cguilliman/chat/database/base"
 )
 
 // get current user
@@ -26,6 +26,22 @@ func GetPerson(id int) {
         fmt.Println(err)
     }
     fmt.Println(person)
+}
+
+// get current user
+func CheckPerson(username string) bool {
+    var id int
+    database := base.GetDB()
+    err := database.QueryRow(fmt.Sprintf(`
+        select 
+            Person.ID
+        from Person 
+        where Person.Username="%s"
+    `, username)).Scan(&id)
+    if err != nil {
+        return false
+    }
+    return true
 }
 
 // func ConvertInString(value interface{}) string {
@@ -80,21 +96,27 @@ func ConvertPersonToPush(person *models.Person) ([]string, []string) {
 }
 
 // create person (registration)
-func CreatePerson(person *models.Person) {
+func CreatePerson(person *models.Person) (int64, error) {
     fields, values := ConvertPersonToPush(person)
+    var id int64
 
     insertFields := strings.Join(fields, ",")
     insertValues := strings.Join(values, ",")
     
     database := base.GetDB()
-    _, err := database.Exec(fmt.Sprintf(`
+    res, err := database.Exec(fmt.Sprintf(`
         insert into Person(%s) 
         values (%s)
     `, insertFields, insertValues))
-    
-    if err != nil {
-        fmt.Println(err)
+    if err != nil{
+        return id, err
+    } else {
+        id, err = res.LastInsertId()        
+        if err != nil {
+            return id, err
+        }
     }
+    return id, nil
 }
 
 

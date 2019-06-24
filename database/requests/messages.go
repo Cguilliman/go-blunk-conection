@@ -3,8 +3,8 @@ package requests
 import (
     "fmt"
     // "database/sql"
-    "github.com/Cguilliman/test_blunk_db/database/models"
-    "github.com/Cguilliman/test_blunk_db/database/base"
+    "github.com/Cguilliman/chat/database/models"
+    "github.com/Cguilliman/chat/database/base"
 )
 
 type Pagination struct {
