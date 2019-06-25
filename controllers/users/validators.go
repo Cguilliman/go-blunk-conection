@@ -1,6 +1,7 @@
 package users
 
 import (
+    // "fmt"
     "github.com/gin-gonic/gin"
     "github.com/gin-gonic/gin/binding"
     "golang.org/x/crypto/bcrypt"
@@ -11,10 +12,10 @@ import (
 
 type UserRegistrationValidator struct {
     Person struct {
-        Username  string `form:"username"  json:"username"  binding:"exists"` 
-        FirstName string `form:"firstname" json:"firstname" binding:"exists"` 
-        LastName  string `form:"lastname"  json:"lastname"  binding:"exists"` 
-        Password  string `form:"password"  json:"password"  binding:"exists"` 
+        Username  string `form:"username"  json:"username"  binding:"required"` 
+        FirstName string `form:"firstname" json:"firstname" binding:"required"` 
+        LastName  string `form:"lastname"  json:"lastname"  binding:"required"` 
+        Password  string `form:"password"  json:"password"  binding:"required"` 
     } `json:"person"`
     personModel models.Person `json:"-"`
 }
@@ -22,7 +23,6 @@ type UserRegistrationValidator struct {
 // TODO: remove to common package
 func ConvertPassword(password []byte) (string, error) {
     hash, err := bcrypt.GenerateFromPassword(password, bcrypt.MinCost)
-    // bcrypt.CompareHashAndPassword(model.Password string, password []byte) - return error
     return string(hash), err
 }
 
@@ -62,4 +62,39 @@ func (self *UserRegistrationValidator) Register() (int64, error) {
 
 func NewRegistrationValidator() UserRegistrationValidator {
     return UserRegistrationValidator{}
+}
+
+type LoginValidator struct {
+    Person struct {
+        Username string `form:"username" json:"username" binding:"required"`
+        Password string `form:"password" json:"password" binding:"required"`
+    }
+    // personModel models.Person
+}
+
+func (self *LoginValidator) Bind(c *gin.Context) error {
+    if err := Bind(c, self); err != nil {
+        return err
+    }
+    return nil
+}
+
+func CheckPassword(modelPsw, password []byte) error {
+    return bcrypt.CompareHashAndPassword(modelPsw, password)
+}
+
+func (self *LoginValidator) Login() (models.Person, error) {
+    person, modelPsw, err := requests.Login(self.Person.Username)
+    if err != nil {
+        return person, err
+    }
+    return person, CheckPassword(
+        []byte(modelPsw), 
+        []byte(self.Person.Password),
+    )
+}
+
+func NewLoginValidator() LoginValidator {
+    validator := LoginValidator{}
+    return validator
 }

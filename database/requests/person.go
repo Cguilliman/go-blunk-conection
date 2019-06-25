@@ -9,7 +9,7 @@ import (
 )
 
 // get current user
-func GetPerson(id int) {
+func GetPerson(id uint) (models.Person, error) {
     database := base.GetDB()
     person := new(models.Person)
     err := database.QueryRow(fmt.Sprintf(`
@@ -22,26 +22,43 @@ func GetPerson(id int) {
         &person.ID, &person.Username, 
         &person.LastName, &person.FirstName,
     )
-    if err != nil {
-        fmt.Println(err)
-    }
-    fmt.Println(person)
+    return *person, err
 }
 
 // get current user
 func CheckPerson(username string) bool {
-    var id int
     database := base.GetDB()
     err := database.QueryRow(fmt.Sprintf(`
         select 
             Person.ID
         from Person 
         where Person.Username="%s"
-    `, username)).Scan(&id)
-    if err != nil {
+    `, username))
+    if err != nil {   // TODO: check only valid error
         return false
     }
     return true
+}
+
+func Login(username string) (models.Person, string, error) {
+    database := base.GetDB()
+    person := new(models.Person)
+    var userPassword string
+    err := database.QueryRow(fmt.Sprintf(`
+        select 
+            Person.ID, Person.Username,
+            Person.FirstName, Person.LastName,
+            Person.Password
+        from Person
+        where 
+            Person.Username="%s"
+    `, username)).Scan(
+        &person.ID, &person.Username,
+        &person.FirstName, &person.LastName,
+        &userPassword,
+    )
+    fmt.Println(err)
+    return *person, userPassword, err
 }
 
 // func ConvertInString(value interface{}) string {
