@@ -28,7 +28,6 @@ func Registration(c *gin.Context) {
     c.JSON(http.StatusCreated, gin.H{"Message": "Success. Approve credentials."})
 }
 
-
 func Login(c *gin.Context) {
     validator := NewLoginValidator()
     if err := validator.Bind(c); err != nil {
