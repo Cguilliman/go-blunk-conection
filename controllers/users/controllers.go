@@ -6,7 +6,8 @@ import (
     "github.com/gin-gonic/gin"
 
     "github.com/Cguilliman/chat/controllers/middlewares"
-    "github.com/Cguilliman/chat/shared"
+    "github.com/Cguilliman/chat/serializers"
+    "github.com/Cguilliman/chat/database/models"
 )
 
 func Registration(c *gin.Context) {
@@ -17,14 +18,14 @@ func Registration(c *gin.Context) {
         })
         return
     }
-    id, err := validator.Register()
+    _, err := validator.Register()
     if err != nil {
         c.JSON(http.StatusUnprocessableEntity, gin.H{
             "errors": err,
         })
         return
     }
-    c.JSON(http.StatusCreated, gin.H{"userID": id})
+    c.JSON(http.StatusCreated, gin.H{"Message": "Success. Approve credentials."})
 }
 
 
@@ -45,8 +46,16 @@ func Login(c *gin.Context) {
         return
     }
     middlewares.UpdateContext(c, person.ID)
+    serializer := serializers.PersonSerializer{c}
     c.JSON(http.StatusOK, gin.H{
-        "person": person, 
-        "token": shared.GenToken(person.ID),
+        "response": serializer.Response(person, true),
+    })
+}
+
+func Receive(c *gin.Context) {
+    person := c.MustGet("user").(models.Person)
+    serializer := serializers.PersonSerializer{c}
+    c.JSON(http.StatusOK, gin.H{
+        "response": serializer.Response(person, false),
     })
 }

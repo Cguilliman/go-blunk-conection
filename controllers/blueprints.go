@@ -12,4 +12,5 @@ func InitRoutings(engine *gin.Engine) {
     v1.POST("users/registration", users.Registration)
     v1.POST("users/login", users.Login)
     v1.Use(middlewares.AuthMiddleware(false))
+    v1.GET("users/receive", users.Receive)
 }
